@@ -17,10 +17,10 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Push to hub
+        - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git config --global user.email "bot@github.com"
           git config --global user.name "GitHub Actions Bot"
-          git push https:yezdata:$HF_TOKEN@huggingface.co/spaces/yezdata/financial-volatility-forecaster main --force
+          git push https://yezdata:$HF_TOKEN@huggingface.co/spaces/yezdata/financial-volatility-forecaster main --force
