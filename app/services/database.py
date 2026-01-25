@@ -7,10 +7,24 @@ from loguru import logger
 from app.config import DB_URL
 
 
-engine = create_engine(DB_URL)
+engine = None
+
+if DB_URL:
+    try:
+        engine = create_engine(DB_URL)
+    except Exception:
+        logger.exception(f"Invalid DB_URL format: {DB_URL}")
+        engine = None
+else:
+    logger.warning("DB_URL is not set. Database features will be disabled.")
 
 
 def create_table() -> None:
+    if engine is None:
+        logger.warning("Database not configured, skipping table creation.")
+        return
+
+
     sql_create = text("""
         CREATE TABLE IF NOT EXISTS garch_preds (
             id SERIAL PRIMARY KEY,
@@ -25,12 +39,17 @@ def create_table() -> None:
     """)
     with engine.begin() as conn:
         conn.execute(sql_create) 
-        logger.info("Succesfully create table 'garch_preds'")
+        logger.info("Succesfully created table 'garch_preds' or table exists")
 
 
 
 
 def store_pred(ticker: str, pred: float, last_data_date: pd.Timestamp, params: dict) -> None:
+    if engine is None:
+        logger.info(f"Skipping DB save for {ticker} (DB not configured)")
+        return
+
+
     target_date = (last_data_date + BusinessDay(1)).date()
     execution_time = datetime.now(timezone.utc)
     pred = pred.item() if hasattr(pred, "item") else float(pred)

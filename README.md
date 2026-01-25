@@ -1,4 +1,4 @@
-# Financial Volatility Forecaster: GARCH Modeling Expert
+# Financial Volatility Forecaster: End-to-End Quantitative Pipeline
 ⚠️ **Note:** This project is currently **in progress**.
 
 App is yet to be **deployed** to hosting
@@ -66,6 +66,18 @@ Overview is available at "api_adress/docs"
 ### API Usage & Response
 The API provides a direct interface to the forecasting engine, returning precise volatility metrics for any given ticker.
 
+**Request example**
+```Curl
+curl -X 'GET' \
+  'http://localhost:8000/predict/AAPL?p=1&q=1&dist=skewt' \
+  -H 'accept: application/json'
+```
+
+```URL
+/predict/AAPL?p=1&q=1&dist=skewt
+```
+
+**Response example**
 ```json
 {
   "ticker": "AAPL",
@@ -74,7 +86,7 @@ The API provides a direct interface to the forecasting engine, returning precise
     "q": 1,
     "dist": "skewt"
   },
-  "predicted_volatility": 1.4258
+  "predicted_volatility": 1.3150843207836038
 }
 ```
 
