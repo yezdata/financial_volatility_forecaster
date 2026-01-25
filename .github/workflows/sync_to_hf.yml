@@ -23,5 +23,11 @@ jobs:
         run: |
           git config --global user.email "bot@github.com"
           git config --global user.name "GitHub Actions Bot"
+
+          cp metadata_hf.md README.md
+
+          git add README.md
+          git commit -m "Setup HF Metadata"
+
           git remote add space "https://yezdata:$HF_TOKEN@huggingface.co/spaces/yezdata/financial-volatility-forecaster"
           git push space main --force
