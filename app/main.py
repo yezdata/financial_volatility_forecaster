@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from loguru import logger
 from typing import Literal
@@ -37,6 +38,11 @@ def startup_db():
         create_table()
     except Exception:
         logger.exception("DB error while creating table 'garch_preds'")
+
+
+@api.get("/")
+def read_root():
+    return RedirectResponse(url="/docs")
 
 
 @api.get("/predict/{ticker}", response_model=PredictionResponse)
