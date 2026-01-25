@@ -4,6 +4,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/spaces/yezdata/financial-volatility-forecaster)
 ![yfinance](https://img.shields.io/badge/Data-yfinance-green)
 
 > **Quick Summary:** A full-stack financial engineering tool designed to predict asset volatility, bridging the gap between raw market data and actionable risk metrics. It fetches historical data via `yfinance`, fits simple but reliable **GARCH(p,q)** models to capture "volatility clustering," and stores predictions in a PostgreSQL database for historical backtesting and evaluation.
@@ -30,7 +31,7 @@ Full interactive documentation (Swagger UI) is available here:
 👉 **[Live API Docs](https://yezdata-financial-volatility-forecaster.hf.space/docs)**
 
 ### Predict Volatility Endpoint
-Get a one-day ahead volatility forecast for a specific asset.
+Get a one-business day ahead volatility forecast for a specific asset.
 
 ```http
 https://yezdata-financial-volatility-forecaster.hf.space/predict/{ticker}?p={p}&q={q}&dist={dist}
@@ -41,7 +42,7 @@ https://yezdata-financial-volatility-forecaster.hf.space/predict/{ticker}?p={p}&
 | `{ticker}` | string | ✅ Yes | - | Target Stock Ticker symbol (e.g., `AAPL`, `BTC-USD`). |
 | `{p}` | int | ❌ No | `1` | **ARCH lag order**: Sensitivity to recent short-term market shocks. |
 | `{q}` | int | ❌ No | `1` | **GARCH lag order**: Long-term persistence (memory) of past volatility. |
-| `{dist}` | string | ❌ No | `skewt` | **Distribution**: Error assumption (`normal`, `t`, `skewt`) to account for fat tails. |
+| `{dist}` | string | ❌ No | `skewt` | **Distribution**: Error assumption to account for fat tails. Available values : **norm, t, skewt, ged** |
 
 **Example Request**
 ```bash
@@ -81,7 +82,7 @@ Handling financial data requires precision. The ingestion engine:
 The system utilizes the industry-standard `arch` library to perform maximum likelihood estimation:
 *   **Volatility Clustering:** Captures the phenomenon where large price changes tend to be followed by large changes.
 *   **Custom Distributions:** Supports `skewt` (Skewed Student's t) to account for "fat tails" and leverage effects in financial markets.
-*   **Forecasting:** Generates one-day ahead conditional volatility forecasts.
+*   **Forecasting:** Generates one-business day ahead conditional volatility forecasts.
 
 ### 3. Database & Persistence Layer
 Instead of transient results, every prediction is grounded in a PostgreSQL backend:
