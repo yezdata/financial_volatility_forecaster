@@ -1,8 +1,4 @@
 # Financial Volatility Forecaster: End-to-End Quantitative Pipeline
-⚠️ **Note:** This project is currently **in progress**.
-
-App is yet to be **deployed** to hosting
-- The service provides automated volatility predictions for financial assets using econometric models.
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
@@ -27,10 +23,49 @@ This project focuses on the **statistical estimation of financial risk**. By mov
 | **Persistence** | Structured storage of predictions for future evaluation. | `PostgreSQL` |
 | **API Interface** | Real-time volatility prediction endpoints. | `FastAPI` |
 
-### Currently Supported Assets
-*   **Equities:** All major tickers (AAPL, TSLA, NVDA, etc.)
-*   **Indices:** S&P 500 (^GSPC), Nasdaq (^IXIC)
-*   **Forex/Crypto:** Supported via Yahoo Finance tickers
+---
+
+## 🚀 API Usage & Documentation
+Full interactive documentation (Swagger UI) is available here:
+👉 **[Live API Docs](https://yezdata-financial-volatility-forecaster.hf.space/docs)**
+
+### Predict Volatility Endpoint
+Get a one-day ahead volatility forecast for a specific asset.
+
+```http
+https://yezdata-financial-volatility-forecaster.hf.space/predict/{ticker}?p={p}&q={q}&dist={dist}
+```
+**Parameters:**
+| Parameter | Type | Required | Default | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| `{ticker}` | string | ✅ Yes | - | Target Stock Ticker symbol (e.g., `AAPL`, `BTC-USD`). |
+| `{p}` | int | ❌ No | `1` | **ARCH lag order**: Sensitivity to recent short-term market shocks. |
+| `{q}` | int | ❌ No | `1` | **GARCH lag order**: Long-term persistence (memory) of past volatility. |
+| `{dist}` | string | ❌ No | `skewt` | **Distribution**: Error assumption (`normal`, `t`, `skewt`) to account for fat tails. |
+
+**Example Request**
+```bash
+curl -X 'GET' \
+  'https://yezdata-financial-volatility-forecaster.hf.space/predict/aapl?p=1&q=1&dist=skewt' \
+  -H 'accept: application/json'
+```
+
+```http
+https://yezdata-financial-volatility-forecaster.hf.space/predict/aapl?p=1&q=1&dist=skewt
+```
+
+**Example Response**
+```json
+{
+  "ticker": "AAPL",
+  "garch_params": {
+    "p": 1,
+    "q": 1,
+    "dist": "skewt"
+  },
+  "predicted_volatility": 1.3150833040963563
+}
+```
 
 ---
 
@@ -57,38 +92,7 @@ Instead of transient results, every prediction is grounded in a PostgreSQL backe
 Exposed the core logic via a modern FastAPI backend, ready for containerized scaling.
 *   **API Design:** Clean Pydantic models for request validation and type-safe responses.
 *   **Containerization:** Fully **Dockerized**, ensuring consistent environments across local development and cloud production.
-*   **Cloud Ready:** Optimized for deployment on **Render / HuggingFace Spaces** or similar hosting providers
----
-
-## 🔍 Visual Demonstration
-Overview is available at "api_adress/docs"
-
-### API Usage & Response
-The API provides a direct interface to the forecasting engine, returning precise volatility metrics for any given ticker.
-
-**Request example**
-```Curl
-curl -X 'GET' \
-  'http://localhost:8000/predict/AAPL?p=1&q=1&dist=skewt' \
-  -H 'accept: application/json'
-```
-
-```URL
-/predict/AAPL?p=1&q=1&dist=skewt
-```
-
-**Response example**
-```json
-{
-  "ticker": "AAPL",
-  "garch_params": {
-    "p": 1,
-    "q": 1,
-    "dist": "skewt"
-  },
-  "predicted_volatility": 1.3150843207836038
-}
-```
+*   **Cloud Ready:** Optimized and deployed on **HuggingFace Spaces**
 
 ---
 
@@ -96,6 +100,7 @@ curl -X 'GET' \
 *   **Backend:** Python 3.12, FastAPI, SQLAlchemy
 *   **Data Science:** Pandas, NumPy, yfinance, Arch-py
 *   **Infrastructure:** PostgreSQL, Docker
+*   **Deployment:** HuggingFace Spaces, GitHub Actions
 *   **Logging:** Loguru
 
 ---
