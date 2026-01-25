@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync-to-hub:
+  sync-to-hf:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
