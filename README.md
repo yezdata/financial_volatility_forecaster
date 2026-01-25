@@ -21,7 +21,7 @@ This project focuses on the **statistical estimation of financial risk**. By mov
 | :--- | :--- | :--- |
 | **Data Ingestion** | Automated fetching of 4-year historical daily returns. | `yfinance` |
 | **Econometric Modeling** | GARCH(p,q) fitting with customizable distributions (Skew-t, GED). | `arch-py` |
-| **Persistence** | Structured storage of predictions for future evaluation, model drifts inspection and retraining | `PostgreSQL` |
+| **Persistence** | Structured storage of predictions for future evaluation. | `PostgreSQL` |
 | **API Interface** | Real-time volatility prediction endpoints. | `FastAPI` |
 
 ---
@@ -87,7 +87,7 @@ The system utilizes the industry-standard `arch` library to perform maximum like
 ### 3. Database & Persistence Layer
 Instead of transient results, every prediction is grounded in a PostgreSQL backend:
 *   **Schema Design:** Stores ticker, target date, model parameters (p, q, dist), and the predicted sigma.
-*   **Retraining:** Get predictions data from PostgreSQL DB - evaluate to inspect any model drifts, retrain model weights, rebuild and redeploy.
+*   **Retraining:** Get predictions data from PostgreSQL DB - evaluate to inspect predictions accuracy on realized days.
 *   **Business Logic:** Automatically calculates the `target_date` using `BusinessDay` offsets to ensure predictions align with market sessions.
 
 ### 4. Deployment & Infrastructure (FastAPI + Docker)
