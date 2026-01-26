@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from loguru import logger
 from typing import Literal
 from datetime import date
-from pandas.tseries.offsets import BusinessDay
 
 from app.config import setup_logging
 from app.config import DEFAULT_P, DEFAULT_Q, DEFAULT_DIST
@@ -61,8 +60,8 @@ def predict(
     ticker = ticker.upper()
     garch_params = {"p": p, "q": q, "dist": dist}
 
-    data = get_data(ticker)
-    if data is None:
+    data, target_date = get_data(ticker)
+    if data is None or target_date is None:
         raise HTTPException(status_code=404, detail=f"Data for ticker '{ticker}' not found")
 
     garch_pred = get_garch_pred(data, p=p, q=q, dist=dist)
@@ -70,8 +69,6 @@ def predict(
     if garch_pred is None:
         raise HTTPException(status_code=500, detail=f"GARCH model failed to converge for {ticker} (check logs)")
 
-    last_date = data.index.max()
-    target_date = (last_date + BusinessDay(1)).date()
     try:
         store_preds(ticker=ticker, pred=garch_pred, target_date=target_date, params=garch_params)
     except Exception:

@@ -25,3 +25,40 @@ def setup_logging() -> None:
         level=LOG_LEVEL,
         enqueue=True
     )
+
+
+
+# Complete Close price cut-offs
+# + 15m for yfinance delay
+MARKET_CUTOFFS = {
+    'EQUITY': {
+        'timezone': 'America/New_York',
+        'hour': 16,
+        'minute': 20
+    },
+    'ETF': {
+        'timezone': 'America/New_York',
+        'hour': 16,
+        'minute': 20
+    },
+    'INDEX': {
+        'timezone': 'America/New_York',
+        'hour': 16,
+        'minute': 20
+    },
+    'FUTURE': {
+        'timezone': 'America/New_York',
+        'hour': 17,
+        'minute': 20
+    },
+    'CURRENCY': {
+        'timezone': 'America/New_York',
+        'hour': 17,
+        'minute': 20
+    },
+    'CRYPTOCURRENCY': {
+        'timezone': 'UTC',
+        'hour': 23,
+        'minute': 59
+    }
+}
