@@ -19,7 +19,7 @@ jobs:
         env:
           DB_URL: ${{ secrets.DB_URL }}
         run: |
-          pip install pandas loguru numpy yfinance python-dotenv sqlalchemy psycopg2-binary
+          pip install pandas loguru numpy yfinance python-dotenv sqlalchemy psycopg2-binary lxml
 
           python -m scripts.predict_nasdaq_100
           python -m scripts.evaluate
