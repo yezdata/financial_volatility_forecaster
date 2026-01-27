@@ -94,7 +94,6 @@ def show_report_dashboard():
     pass
 
 
-
 @api.get("/health", status_code=200)
 def health_check():
     return {"status": "healthy"}

@@ -1,20 +1,25 @@
-#name: Daily Model Evaluation
-#on:
-#  schedule:
-#    # Spustit každý den v 06:00 ráno (kdy už jsou data z yfinance určitě hotová)
-#    - cron: '0 6 * * *'
-#jobs:
-#  evaluate:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Run Evaluation ETL
-#        env:
-#          DB_URL: ${{ secrets.DB_URL }}
-#        run: |
-#          # TODO localni requirements jen pro ty 2 scripty nejak udelat
-#          pip install -r requirements.txt
-#          python scripts/evaluate_performance.py
-#
-#          # TODO
-#          python scripts/predict_nasdaq_100.py
+name: Daily Model Predictions for Nasdaq-100 + Evaluation
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Run Scripts
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+        run: |
+          pip install pandas loguru numpy yfinance python-dotenv sqlalchemy psycopg2-binary
+
+          python -m scripts.predict_nasdaq_100
+          python -m scripts.evaluate
