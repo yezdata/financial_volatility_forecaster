@@ -1,9 +1,9 @@
-from datetime import datetime, timezone, date
-from sqlalchemy import create_engine, text
+from datetime import date, datetime, timezone
+
 from loguru import logger
+from sqlalchemy import create_engine, text
 
 from app.config import DB_URL
-
 
 engine = None
 
@@ -22,7 +22,6 @@ def create_table() -> None:
         logger.warning("Database not configured, skipping table creation.")
         return
 
-
     sql_create = text("""
         CREATE TABLE IF NOT EXISTS garch_preds (
             id SERIAL PRIMARY KEY,
@@ -37,16 +36,14 @@ def create_table() -> None:
         );
     """)
     with engine.begin() as conn:
-        conn.execute(sql_create) 
+        conn.execute(sql_create)
         logger.info("Succesfully created table 'garch_preds' or table exists")
-
 
 
 def store_preds(ticker: str, pred: float, target_date: date, params: dict) -> None:
     if engine is None:
         logger.info(f"Skipping DB save for {ticker} (DB not configured)")
         return
-
 
     execution_time = datetime.now(timezone.utc)
     pred = pred.item() if hasattr(pred, "item") else float(pred)
@@ -60,13 +57,16 @@ def store_preds(ticker: str, pred: float, target_date: date, params: dict) -> No
             execution_time = EXCLUDED.execution_time;
     """)
     with engine.begin() as conn:
-        conn.execute(sql_insert, {
-            "ticker": ticker, 
-            "target_date": target_date, 
-            "execution_time": execution_time,
-            "p": params["p"],
-            "q": params["q"],
-            "dist": params["dist"],
-            "prediction": pred
-        })
+        conn.execute(
+            sql_insert,
+            {
+                "ticker": ticker,
+                "target_date": target_date,
+                "execution_time": execution_time,
+                "p": params["p"],
+                "q": params["q"],
+                "dist": params["dist"],
+                "prediction": pred,
+            },
+        )
         logger.info(f"Stored prediction for {ticker} (Target: {target_date})")
