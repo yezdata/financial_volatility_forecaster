@@ -8,13 +8,14 @@ from loguru import logger
 from pydantic import BaseModel
 
 from app.config import DEFAULT_DIST, DEFAULT_P, DEFAULT_Q, setup_logging
-from app.services.database import create_table, store_preds
+from app.services.database import create_preds_table, get_error_data, store_preds
 from app.services.fetch_data import get_data
 from app.services.garch_model import get_garch_pred
 
 setup_logging()
 
 api = FastAPI(title="Financial Volatility Forecaster")
+templates = Jinja2Templates(directory="app/templates")
 
 
 # ---Pydantic models---
@@ -39,7 +40,7 @@ class PredictionResponse(BaseModel):
 @api.on_event("startup")
 def startup_db():
     try:
-        create_table()
+        create_preds_table()
     except Exception:
         logger.exception("DB error while creating table 'garch_preds'")
 
@@ -88,10 +89,28 @@ def predict(
     }
 
 
-@api.get("/report")
+
+
+@api.get("/report", response_class=HTMLResponse)
 def show_report_dashboard():
-    # TODO
-    pass
+    error_data = get_error_data
+
+    metrics = get_metrics_data(error_data)
+    plots = get_plots(error_data)
+
+    return templates.TemplateResponse("report.html", {
+            "request": request,
+            "target_date": str(df.iloc[0]['target_date']),
+            "count": len(df),
+            "mape": mape,
+            "mae": mae,
+            "rmse": rmse,
+            "bias": bias,
+            "plot_scatter": plots['scatter_html'],
+            "plot_hist": plots['hist_html'],
+            "table_html": table_html
+    })
+
 
 
 @api.get("/health", status_code=200)

@@ -22,7 +22,7 @@ else:
     sys.exit(1)
 
 
-def create_table() -> None:
+def create_perf_table() -> None:
     sql_create = text("""
         CREATE TABLE IF NOT EXISTS garch_performance (
             id SERIAL PRIMARY KEY,
@@ -30,6 +30,7 @@ def create_table() -> None:
             target_date DATE NOT NULL,
             ticker VARCHAR(10),
             realized_vol FLOAT,
+            error_raw FLOAT,
             error_abs FLOAT,
             error_rel FLOAT,
             error_sq FLOAT
@@ -56,7 +57,7 @@ def get_missing_preds() -> dict:
         missing_preds = conn.execute(sql_extract).fetchall()
         if not missing_preds:
             logger.info("No pending evaluations found. Everything is up to date.")
-            sys.exit(1)
+            sys.exit(0)
 
     logger.info(f"Found {len(missing_preds)} pending evaluations.")
 
@@ -71,7 +72,7 @@ def get_missing_preds() -> dict:
 
 
 def run_evaluation() -> None:
-    create_table()
+    create_perf_table()
 
     preds_by_date = get_missing_preds()
 
@@ -127,9 +128,12 @@ def run_evaluation() -> None:
                         else float(real_vol)
                     )
 
-                    error_abs = abs(row.prediction - real_vol)
-                    error_rel = (error_abs / real_vol) if real_vol != 0 else 0.0
+                    error_raw = row.prediction - real_vol
+                    error_abs = abs(error_raw)
+                    error_rel = (error_raw / real_vol) if real_vol != 0 else 0.0
                     error_sq = error_abs**2
+
+                    logger.info(f"ERROR: {error_raw}, ERROR ABS: {error_abs}")
 
                     results_to_insert.append(
                         {
@@ -137,6 +141,7 @@ def run_evaluation() -> None:
                             "target_date": eval_date,
                             "ticker": row.ticker,
                             "realized_vol": real_vol,
+                            "error_raw": error_raw,
                             "error_abs": error_abs,
                             "error_rel": error_rel,
                             "error_sq": error_sq,
@@ -150,9 +155,9 @@ def run_evaluation() -> None:
             if results_to_insert:
                 sql_insert = text("""
                    INSERT INTO garch_performance
-                   (evaluation_date, target_date, ticker, realized_vol, error_abs, error_rel, error_sq)
+                   (evaluation_date, target_date, ticker, realized_vol, error_raw, error_abs, error_rel, error_sq)
                    VALUES
-                   (:evaluation_date, :target_date, :ticker, :realized_vol, :error_abs, :error_rel, :error_sq)
+                   (:evaluation_date, :target_date, :ticker, :realized_vol, :error_raw, :error_abs, :error_rel, :error_sq)
                """)
 
                 with engine.begin() as conn:
