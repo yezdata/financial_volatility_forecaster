@@ -128,9 +128,9 @@ def run_evaluation() -> None:
                         else float(real_vol)
                     )
 
-                    error_raw = row.prediction - real_vol
+                    error_raw = real_vol - row.prediction
                     error_abs = abs(error_raw)
-                    error_rel = (error_raw / real_vol) if real_vol != 0 else 0.0
+                    error_rel = (error_abs / real_vol) if real_vol != 0 else 0.0
                     error_sq = error_abs**2
 
                     logger.info(f"ERROR: {error_raw}, ERROR ABS: {error_abs}")
