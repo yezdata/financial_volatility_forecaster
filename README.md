@@ -76,7 +76,7 @@ curl -X 'GET' \
 ## 🛠️ Engineering Highlights
 
 ### 1. Modernized Data Pipeline
-The system uses custom centralized data service: [Financial Data Fetcher](https://huggingface.co/spaces/yezdata/financial-data-fetcher/docs):
+The system uses custom centralized data service: [Financial Data Fetcher](https://yezdata-financial-data-fetcher.hf.space/docs):
 *   **Financial Data Fetcher API:** Leverages a dedicated API to retrieve clean, pre-processed historical data.
 *   **Log-Returns Transformation:** Automatically converts raw closing prices into stationary log-returns, essential for statistical modeling.
 *   **Resiliency:** Robust error handling for API failures and data inconsistencies.
