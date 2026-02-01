@@ -3,7 +3,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](#)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)](#)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](#)
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/spaces/yezdata/financial-volatility-forecaster)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=black)](https://yezdata-financial-volatility-forecaster.hf.space)
 
 > **Quick Summary:** A full-stack financial engineering tool designed to predict asset volatility, bridging the gap between raw market data and actionable risk metrics. It fits reliable **GARCH(p,q)** models to capture "volatility clustering" and stores predictions in a PostgreSQL database for historical backtesting and evaluation.
 
