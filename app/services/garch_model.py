@@ -2,7 +2,7 @@ import numpy as np
 from arch import arch_model
 from loguru import logger
 
-from app.main import GarchParams
+from app.config import GarchParams
 
 
 def get_garch_pred(log_return, params: GarchParams) -> float | None:

@@ -1,8 +1,29 @@
 import os
 import sys
+from datetime import date
+from typing import Literal
 
 from dotenv import load_dotenv
 from loguru import logger
+from pydantic import BaseModel
+
+# ---Pydantic models---
+DistType = Literal["normal", "t", "skewt", "ged"]
+
+
+class GarchParams(BaseModel):
+    p: int
+    q: int
+    dist: DistType
+
+
+class PredictionResponse(BaseModel):
+    ticker: str
+    target_date: date
+    model: str
+    model_params: GarchParams
+    predicted_volatility: float
+
 
 # GARCH Model Defaults
 DEFAULT_P = 1

@@ -1,6 +1,4 @@
 import time
-from datetime import date
-from typing import Literal
 
 import requests
 import uvicorn
@@ -10,9 +8,8 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 from numpy import log as nplog
 from pandas import DataFrame
-from pydantic import BaseModel
 
-from app.config import DEFAULT_DIST, DEFAULT_P, DEFAULT_Q, setup_logging
+from app.config import DistType, GarchParams, PredictionResponse, DEFAULT_DIST, DEFAULT_P, DEFAULT_Q, setup_logging
 from app.services.database import create_preds_table, get_error_data, store_preds
 from app.services.garch_model import get_garch_pred
 from app.services.report import get_metrics_data, get_plots
@@ -21,24 +18,6 @@ setup_logging()
 
 api = FastAPI(title="Financial Volatility Forecaster")
 templates = Jinja2Templates(directory="app/templates")
-
-
-# ---Pydantic models---
-DistType = Literal["normal", "t", "skewt", "ged"]
-
-
-class GarchParams(BaseModel):
-    p: int
-    q: int
-    dist: DistType
-
-
-class PredictionResponse(BaseModel):
-    ticker: str
-    target_date: date
-    model: str
-    model_params: GarchParams
-    predicted_volatility: float
 
 
 # ---Endpoints---

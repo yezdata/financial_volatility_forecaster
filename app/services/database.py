@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy import create_engine, text
 
 from app.config import DB_URL
-from app.main import GarchParams
+from app.config import GarchParams
 
 engine = None
 
