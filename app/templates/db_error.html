@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Error</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .error-container { max-width: 600px; width: 100%; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .error-code { color: #dc3545; font-weight: bold; font-family: monospace; }
+        .tech-details { background: #e9ecef; padding: 1rem; border-radius: 4px; font-size: 0.85rem; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<div class="error-container">
+    <h2 class="text-danger mb-4">Database Connection Failed</h2>
+    
+    <p class="lead">System encountered an error while attempting to retrieve performance data.</p>
+    
+    <div class="alert alert-warning">
+        <strong>Error Context:</strong> Could not fetch <code>GARCH performance data</code> from the remote PostgreSQL instance.
+    </div>
+
+    <p>The application is unable to establish a secure link with the remote database server. This may be due to network latency, incorrect credentials, or the service being temporarily offline.</p>
+
+    <div class="tech-details">
+        <p class="mb-1"><strong>Technical Diagnostics:</strong></p>
+        <ul class="mb-0">
+            <li>Service: <code>PostgreSQL Remote DB</code></li>
+            <li>Status: <span class="error-code">CONNECTION_REFUSED / TIMEOUT</span></li>
+            <li>Target: <code>garch_performance_schema</code></li>
+        </ul>
+    </div>
+
+    <div class="mt-4">
+        <button onclick="window.location.reload()" class="btn btn-outline-secondary btn-sm">Retry Connection</button>
+    </div>
+</div>
+
+</body>
+</html>

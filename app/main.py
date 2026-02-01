@@ -1,3 +1,4 @@
+import time
 from datetime import date
 from typing import Literal
 
@@ -123,7 +124,36 @@ def predict(
 
 @api.get("/report", response_class=HTMLResponse)
 def show_report_dashboard(request: Request):
-    error_data = get_error_data()
+    error_data = None
+    i = 0
+    attempts = 10
+
+    while i < attempts:
+        try:
+            error_data = get_error_data()
+            if error_data is None or error_data.empty:
+                attempts -= 1
+                logger.error(
+                    f"Could not get data from 'garch_performance' DB\nAttempt:{i}\nRetrying..."
+                )
+                time.sleep(5)
+
+            break
+
+        except Exception:
+            attempts -= 1
+            logger.exception(
+                f"Got Exception while getting data from garch_performance\nAttempt: {i}\nRetrying..."
+            )
+            time.sleep(5)
+
+    if error_data is None or error_data.empty:
+        logger.error(
+            "Could not get data from 'garch_performance' DB\nMax attempt reached\nReturning error page"
+        )
+        return templates.TemplateResponse(
+            "db_error.html", {"request": request}, status_code=503
+        )
 
     metrics_date, metrics_ticker, worst_tickers = get_metrics_data(error_data)
     plots = get_plots(metrics_date, metrics_ticker)
