@@ -4,8 +4,7 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine, text
 
-from app.config import DB_URL
-from app.config import GarchParams
+from app.config import DB_URL, GarchParams
 
 engine = None
 
