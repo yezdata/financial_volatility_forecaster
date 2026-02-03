@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import datetime, timedelta
 
@@ -6,7 +7,7 @@ import yfinance as yf  # type: ignore
 from loguru import logger
 from sqlalchemy import create_engine, text
 
-from app.config import DB_URL
+DB_URL = os.getenv("DB_URL", None)
 
 if DB_URL:
     try:
