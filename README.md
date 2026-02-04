@@ -19,7 +19,7 @@ The pipeline now includes **automated daily predictions for the Nasdaq-100** and
 
 | Component | Feature | Technology |
 | :--- | :--- | :--- |
-| **Data Ingestion** | Fetching historical daily returns via custom external API. | [Financial Data Fetcher API](https://yezdata-financial-data-fetcher.hf.space/docs) |
+| **Data Ingestion** | Fetching historical daily returns via custom pip package (yfinance wrapper). | [FinFetcher](https://github.com/eolybq/finfetcher) |
 | **Statistical Modeling** | GARCH(p,q) fitting with customizable distributions (Skew-t, GED). | `arch-py` |
 | **Persistence** | Structured storage of predictions for historical tracking. | `PostgreSQL` |
 | **Dashboard** | Interactive report for Nasdaq-100 forecast evaluation. | `Jinja2`, `Plotly`, `Bootstrap` |
@@ -76,8 +76,8 @@ curl -X 'GET' \
 ## 🛠️ Engineering Highlights
 
 ### 1. Modernized Data Pipeline
-The system uses custom centralized data service: [Financial Data Fetcher](https://yezdata-financial-data-fetcher.hf.space/docs):
-*   **Financial Data Fetcher API:** Leverages a dedicated API to retrieve clean, pre-processed historical data.
+The system uses a custom data library: [FinFetcher](https://github.com/eolybq/finfetcher):
+*   **FinFetcher Library:** Leverages a custom `yfinance` wrapper (available on [PyPI](https://pypi.org/project/finfetcher/)) to retrieve clean, pre-processed historical data.
 *   **Log-Returns Transformation:** Automatically converts raw closing prices into stationary log-returns, essential for statistical modeling.
 *   **Resiliency:** Robust error handling for API failures and data inconsistencies.
 
