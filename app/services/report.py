@@ -15,6 +15,7 @@ def get_metrics(df_grouped: pd.DataFrame) -> pd.DataFrame:
             "mae": mae,
             "rmse": rmse,
             "bias": bias,
+            # TODO: model_config
         }
     )
 
@@ -49,6 +50,7 @@ def get_metrics_data(
             "mae": "MAE",
             "rmse": "RMSE",
             "bias": "Bias (mean error)",
+            # TODO: model_config
         },
         inplace=True,
     )
@@ -60,6 +62,7 @@ def get_metrics_data(
             "mae": "MAE",
             "rmse": "RMSE",
             "bias": "Bias (mean error)",
+            # TODO: model_config
         },
         inplace=True,
     )
@@ -70,6 +73,7 @@ def get_metrics_data(
 def get_plots(
     metrics_df_date: pd.DataFrame, metrics_df_ticker: pd.DataFrame
 ) -> dict[str, str]:
+    # TODO: model_config -> color
     ts_fig = px.line(
         metrics_df_date,
         x="Prediction Date",
@@ -79,6 +83,7 @@ def get_plots(
     )
     ts_fig_html = ts_fig.to_html(full_html=False, include_plotlyjs=False)
 
+    # TODO: model_config -> color
     scatter_fig = px.scatter(
         metrics_df_ticker,
         x="Ticker",

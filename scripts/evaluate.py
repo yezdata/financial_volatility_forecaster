@@ -24,7 +24,7 @@ else:
 
 def create_perf_table() -> None:
     sql_create = text("""
-        CREATE TABLE "garch_performance" (
+        CREATE TABLE IF NOT EXISTS "garch_performance" (
         "prediction_id" integer PRIMARY KEY,
         
         "evaluation_date" date NOT NULL,
