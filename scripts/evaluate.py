@@ -52,7 +52,7 @@ def get_missing_preds() -> dict:
             p.id,
             p.ticker, 
             p.target_date, 
-            p.prediction, 
+            p.prediction
         FROM garch_preds AS p
         LEFT JOIN garch_performance AS gp
             ON p.id = gp.prediction_id
