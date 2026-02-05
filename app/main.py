@@ -1,5 +1,3 @@
-import time
-
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -95,36 +93,14 @@ def predict(
 
 @api.get("/report", response_class=HTMLResponse)
 def show_report_dashboard(request: Request):
-    error_data = None
-    attempts = 10
-
-    for i in range(attempts):
-        try:
-            error_data = get_error_data()
-            error_data["error_rel"] = error_data["error_rel"] * 100
-
-            if error_data is not None and not error_data.empty:
-                break
-
-            logger.debug(
-                f"Attempt {i + 1}/{attempts}: Could not get data from 'garch_performance' DB. Retrying..."
-            )
-
-        except Exception as e:
-            logger.debug(
-                f"Attempt {i + 1}/{attempts}: Exception fetching data: {e}. Retrying..."
-            )
-
-        if i < attempts - 1:
-            time.sleep(5)
+    error_data = get_error_data()
 
     if error_data is None or error_data.empty:
-        logger.error(
-            "Could not get data from 'garch_performance' DB\nMax attempt reached\nReturning error page"
-        )
         return templates.TemplateResponse(
             "db_error.html", {"request": request}, status_code=503
         )
+
+    error_data["error_rel"] = error_data["error_rel"] * 100
 
     try:
         metrics_date, metrics_ticker, worst_tickers = get_metrics_data(error_data)

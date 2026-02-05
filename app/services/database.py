@@ -1,3 +1,4 @@
+import time
 from datetime import date, datetime, timezone
 
 import pandas as pd
@@ -72,20 +73,46 @@ def store_preds(
         logger.info(f"Stored prediction for {ticker} (Target: {target_date})")
 
 
-def get_error_data() -> pd.DataFrame:
+def get_error_data() -> pd.DataFrame | None:
+    error_df = None
+
     if engine is None:
         raise Exception("Could not connect to DB")
 
-    sql_extract = text("""
-        SELECT ticker, target_date, error_abs, error_rel, error_sq, error_raw
-        FROM garch_performance
-        WHERE target_date < CURRENT_DATE
-            AND target_date >= CURRENT_DATE - INTERVAL '7 days'
-    """)
+    attempts = 10
+    for i in range(attempts):
+        try:
+            sql_extract = text("""
+                SELECT p.ticker, p.target_date, p.model_config, gp.error_abs, gp.error_rel, gp.error_sq, gp.error_raw
+                FROM garch_performance gp JOIN garch_preds p
+                WHERE p.target_date < CURRENT_DATE
+                    AND p.target_date >= CURRENT_DATE - INTERVAL '7 days'
+            """)
 
-    with engine.begin() as conn:
-        error_df = pd.read_sql(sql_extract, conn)
-        logger.info("Got performance data for last week from DB")
-        logger.debug(f"Error DF rows: {error_df.count()}")
+            with engine.begin() as conn:
+                error_df = pd.read_sql(sql_extract, conn)
+                logger.info("Got performance data for last week from DB")
+                logger.debug(f"Error DF rows: {error_df.count()}")
+
+            if error_df is not None and not error_df.empty:
+                break
+
+            logger.debug(
+                f"Attempt {i + 1}/{attempts}: Could not get data from 'garch_performance' DB. Retrying..."
+            )
+
+        except Exception as e:
+            logger.debug(
+                f"Attempt {i + 1}/{attempts}: Exception fetching data: {e}. Retrying..."
+            )
+
+        if i < attempts - 1:
+            time.sleep(5)
+
+    if error_df is None or error_df.empty:
+        logger.error(
+            "Could not get data from 'garch_performance' DB\nMax attempt reached\nReturning error page"
+        )
+        return None
 
     return error_df

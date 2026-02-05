@@ -58,7 +58,7 @@ def get_missing_preds() -> dict:
             ON p.id = gp.prediction_id
         WHERE gp.prediction_id IS NULL
             AND p.target_date < CURRENT_DATE
-            AND p.target_date >= CURRENT_DATE - INTERVAL '10 days'
+            AND p.target_date >= CURRENT_DATE - INTERVAL '7 days'
         ORDER BY p.target_date ASC;
     """)
 
@@ -141,8 +141,6 @@ def run_evaluation() -> None:
                     error_abs = abs(error_raw)
                     error_rel = (error_abs / real_vol) if real_vol != 0 else 0.0
                     error_sq = error_abs**2
-
-                    logger.info(f"ERROR: {error_raw}, ERROR ABS: {error_abs}")
 
                     results_to_insert.append(
                         {
