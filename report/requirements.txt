@@ -15,7 +15,6 @@ jsonschema-specifications==2025.9.1
 MarkupSafe==3.0.3
 narwhals==2.16.0
 numpy==2.4.2
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1769093650/work
 pandas==2.3.3
 pandas-stubs==3.0.0.260204
 pillow==12.1.0
