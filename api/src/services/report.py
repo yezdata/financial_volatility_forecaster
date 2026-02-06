@@ -1,5 +1,4 @@
 import pandas as pd
-import plotly.express as px
 from numpy import sqrt as npsq
 
 
@@ -15,7 +14,6 @@ def get_metrics(df_grouped: pd.DataFrame) -> pd.DataFrame:
             "mae": mae,
             "rmse": rmse,
             "bias": bias,
-            # TODO: model_config
         }
     )
 
@@ -23,18 +21,24 @@ def get_metrics(df_grouped: pd.DataFrame) -> pd.DataFrame:
 def get_metrics_data(
     df: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    df_grouped_date = df.groupby("target_date").mean(numeric_only=True)
-    df_grouped_ticker = df.groupby("ticker").mean(numeric_only=True)
+    df_grouped_date = df.groupby(["target_date", "model_config"]).mean(
+        numeric_only=True
+    )
+    df_grouped_ticker = df.groupby(["ticker", "model_config"]).mean(numeric_only=True)
 
-    worst_tickers = df.sort_values("error_abs", ascending=False)[
-        ["ticker", "error_raw", "error_rel", "error_sq"]
-    ].head(10)
+    worst_tickers = (
+        df_grouped_ticker.sort_values("error_abs", ascending=False)
+        .head(10)
+        .reset_index()
+    )
     worst_tickers.rename(
         columns={
             "ticker": "Ticker",
-            "error_raw": "Error",
-            "error_rel": "Percent Error",
-            "error_sq": "Squared Error",
+            "model_config": "Model Config",
+            "error_raw": "Avg Error (Bias)",
+            "error_rel": "Avg % Error",
+            "error_abs": "Avg Abs Error",
+            "error_sq": "Avg Squared Error",
         },
         inplace=True,
     )
@@ -46,11 +50,11 @@ def get_metrics_data(
     metrics_df_date.rename(
         columns={
             "target_date": "Prediction Date",
+            "model_config": "Model Config",
             "mape": "MAPE",
             "mae": "MAE",
             "rmse": "RMSE",
             "bias": "Bias (mean error)",
-            # TODO: model_config
         },
         inplace=True,
     )
@@ -58,38 +62,13 @@ def get_metrics_data(
     metrics_df_ticker.rename(
         columns={
             "ticker": "Ticker",
+            "model_config": "Model Config",
             "mape": "MAPE",
             "mae": "MAE",
             "rmse": "RMSE",
             "bias": "Bias (mean error)",
-            # TODO: model_config
         },
         inplace=True,
     )
 
     return metrics_df_date, metrics_df_ticker, worst_tickers
-
-
-def get_plots(
-    metrics_df_date: pd.DataFrame, metrics_df_ticker: pd.DataFrame
-) -> dict[str, str]:
-    # TODO: model_config -> color
-    ts_fig = px.line(
-        metrics_df_date,
-        x="Prediction Date",
-        y="MAPE",
-        title="Mean Percentage Absolute Error for Nasdaq-100",
-        markers=True,
-    )
-    ts_fig_html = ts_fig.to_html(full_html=False, include_plotlyjs=False)
-
-    # TODO: model_config -> color
-    scatter_fig = px.scatter(
-        metrics_df_ticker,
-        x="Ticker",
-        y="MAE",
-        title="Mean Absolute Error per last week",
-    )
-    scatter_fig_html = scatter_fig.to_html(full_html=False, include_plotlyjs=False)
-
-    return {"ts_html": ts_fig_html, "scatter_html": scatter_fig_html}

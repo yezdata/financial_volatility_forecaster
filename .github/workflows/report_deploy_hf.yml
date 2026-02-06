@@ -1,0 +1,53 @@
+name: REPORT-Hugging Face Hub Deployment
+
+on:
+  push:
+    branches: [main] 
+    paths:
+      - 'report/**'
+
+  workflow_dispatch:
+
+jobs:
+  deploy-to-hf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pyright pandas-stubs
+          pip install -r report/requirements.txt 
+
+      - name: Ruff Check and Format
+        run: |
+          ruff check report/
+          ruff format --check --diff report/
+
+      - name: Pyright Type Check
+        run: pyright report/
+
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "bot@github.com"
+          git config --global user.name "GitHub Actions Bot"
+
+          cp report/metadata_hf.md report/README.md
+          git add report/README.md
+          git commit -m "Setup HF Metadata" || echo "No changes to commit"
+
+          git remote add space "https://yezdata:$HF_TOKEN@huggingface.co/spaces/yezdata/financial-volatility-forecaster-report"
+          git subtree push --prefix report space main --force

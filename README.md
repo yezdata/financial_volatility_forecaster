@@ -22,7 +22,7 @@ The pipeline now includes **automated daily predictions for the Nasdaq-100** and
 | **Data Ingestion** | Fetching historical daily returns via custom pip package (yfinance wrapper). | [FinFetcher](https://github.com/eolybq/finfetcher) |
 | **Statistical Modeling** | GARCH(p,q) fitting with customizable distributions (Skew-t, GED). | `arch-py` |
 | **Persistence** | Structured storage of predictions for historical tracking. | `PostgreSQL` |
-| **Dashboard** | Interactive report for Nasdaq-100 forecast evaluation. | `Jinja2`, `Plotly`, `Bootstrap` |
+| **Dashboard** | Interactive report for Nasdaq-100 forecast evaluation. | `Streamlit`, `Plotly` |
 | **API Interface** | Real-time volatility prediction endpoints. | `FastAPI` |
 
 ---
@@ -32,19 +32,19 @@ Full interactive documentation (Swagger UI) is available here:
 👉 **[Live API Docs](https://yezdata-financial-volatility-forecaster.hf.space/docs)**
 
 ### Prediction Evaluation Dashboard
-View the performance of Nasdaq-100 forecasts from the last 7 days.
-👉 **[Live Performance Report](https://yezdata-financial-volatility-forecaster.hf.space/report)**
+View the performance of Nasdaq-100 forecasts from the last 10 days.
+👉 **[Live Performance Report](https://yezdata-financial-volatility-forecaster-report.hf.space)**
 
 ### Predict Volatility Endpoint
 Get a one-business day ahead volatility forecast for a specific asset.
 
 ```http
-https://yezdata-financial-volatility-forecaster.hf.space/predict/{ticker}?p={p}&q={q}&dist={dist}
+https://yezdata-financial-volatility-forecaster.hf.space/predict/{symbol}?p={p}&q={q}&dist={dist}
 ```
 **Parameters:**
 | Parameter | Type | Required | Default | Description |
 | :--- | :--- | :---: | :---: | :--- |
-| `{ticker}` | string | ✅ Yes | - | Target Stock Ticker symbol (e.g., `AAPL`, `BTC-USD`). |
+| `{symbol}` | string | ✅ Yes | - | Target Stock Ticker symbol (e.g., `AAPL`, `BTC-USD`). |
 | `{p}` | int | ❌ No | `1` | **ARCH lag order**: Sensitivity to recent short-term market shocks. |
 | `{q}` | int | ❌ No | `1` | **GARCH lag order**: Long-term persistence (memory) of past volatility. |
 | `{dist}` | string | ❌ No | `skewt` | **Distribution**: Error assumption to account for fat tails. Available values : **normal, t, skewt, ged** |
@@ -59,7 +59,7 @@ curl -X 'GET' \
 **Example Response**
 ```json
 {
-  "ticker": "AAPL",
+  "symbol": "AAPL",
   "target_date": "2026-01-26",
   "model": "garch",
   "model_params": {
@@ -90,13 +90,12 @@ The project now features a production-ready automation flow:
 Instead of transient results, every prediction is grounded in a PostgreSQL backend:
 *   **Schema Design:** Stores ticker, target date, model parameters (p, q, dist), and the predicted sigma.
 *   **Evaluation:** Get predictions data from PostgreSQL DB - evaluate to inspect predictions accuracy on realized days.
-*   **Business Logic:** Automatically calculates the `target_date` using `BusinessDay` (for Crypto -> basic 1 day offset) offsets to ensure predictions align with market sessions.
 
-
-### 4. Performance Dashboard (`/report`)
+### 4. Performance Dashboard (Streamlit)
 A new interactive dashboard provides transparency into model performance:
-*   **Time-Series Tracking:** Visualize Mean Absolute Percentage Error (MAPE) trends over the last week.
+*   **Time-Series Tracking:** Visualize Mean Absolute Percentage Error (MAPE) trends over the last days.
 *   **Asset Performance:** Identify which tickers are most difficult to forecast with scatter plots of Mean Absolute Error (MAE).
+*   **Mean Metrics Table:** Shows numerical metrics for past days in their means across the Nasdaq-100 portfolio.
 *   **Worst Tickers Table:** Lists assets where the model deviated most from reality, aiding in parameter tuning.
 
 ### 5. High-Fidelity Volatility Modeling (`garch_model.py`)

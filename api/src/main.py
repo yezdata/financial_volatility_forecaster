@@ -1,28 +1,27 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from finfetcher import DataFetcher
 from loguru import logger
 from numpy import log as nplog
 
-from app.config import (
+from src.config import (
     DEFAULT_DIST,
     DEFAULT_P,
     DEFAULT_Q,
     DistType,
     GarchParams,
     PredictionResponse,
+    ReportResponse,
     setup_logging,
 )
-from app.services.database import create_preds_table, get_error_data, store_preds
-from app.services.garch_model import get_garch_pred
-from app.services.report import get_metrics_data, get_plots
+from src.services.database import create_preds_table, get_error_data, store_preds
+from src.services.garch_model import get_garch_pred
+from src.services.report import get_metrics_data
 
 setup_logging()
 
 api = FastAPI(title="Financial Volatility Forecaster")
-templates = Jinja2Templates(directory="app/templates")
 
 
 # ---Endpoints---
@@ -91,47 +90,29 @@ def predict(
     }
 
 
-@api.get("/report", response_class=HTMLResponse)
-def show_report_dashboard(request: Request):
+@api.get("/report", response_model=ReportResponse)
+def get_report_data():
     error_data = get_error_data()
 
     if error_data is None or error_data.empty:
-        return templates.TemplateResponse(
-            "db_error.html", {"request": request}, status_code=503
-        )
+        raise HTTPException(status_code=501, detail="DB ERROR")
 
     error_data["error_rel"] = error_data["error_rel"] * 100
 
     try:
-        metrics_date, metrics_ticker, worst_tickers = get_metrics_data(error_data)
-        plots = get_plots(metrics_date, metrics_ticker)
-
-        return templates.TemplateResponse(
-            "report.html",
-            {
-                "request": request,
-                "metrics": metrics_date.to_html(
-                    index=False,
-                    classes="table table-striped table-bordered table-hover",
-                    border=0,
-                ),
-                "worst_tickers": worst_tickers.to_html(
-                    index=False,
-                    classes="table table-striped table-bordered table-hover",
-                    border=0,
-                ),
-                "plot_scatter": plots["scatter_html"],
-                "plot_ts": plots["ts_html"],
-            },
+        metrics_df_date, metrics_df_ticker, worst_df_tickers = get_metrics_data(
+            error_data
         )
+
+        return {
+            "metrics_date": metrics_df_date.to_dict(orient="records"),
+            "metrics_ticker": metrics_df_ticker.to_dict(orient="records"),
+            "worst_tickers": worst_df_tickers.to_dict(orient="records"),
+        }
 
     except Exception as e:
         logger.exception(f"Critical error while processing report data: {e}")
-        return templates.TemplateResponse(
-            "processing_error.html",
-            {"request": request},
-            status_code=500,
-        )
+        raise HTTPException(status_code=500, detail="PROCESSING_ERROR")
 
 
 @api.get("/health", status_code=200)
@@ -140,4 +121,4 @@ def health_check():
 
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:api", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.main:api", host="0.0.0.0", port=8000, reload=True)

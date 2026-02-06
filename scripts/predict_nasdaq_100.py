@@ -1,3 +1,4 @@
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from io import StringIO
@@ -5,6 +6,11 @@ from io import StringIO
 import pandas as pd
 import requests
 from loguru import logger
+
+API_URL = os.getenv("API_URL")
+if not API_URL:
+    logger.error("API_URL environment variable is not set.")
+    sys.exit(1)
 
 
 def get_nasdaq_100() -> list | None:
@@ -30,14 +36,14 @@ def get_nasdaq_100() -> list | None:
         return None
 
 
-API_URL = "https://yezdata-financial-volatility-forecaster.hf.space/predict/{ticker}"
+API_ENDPOINT = API_URL + "/predict/{ticker}"
 
 
 def trigger_ticker(ticker: str) -> tuple[bool, str, str | None]:
     params = {"p": 4, "q": 4, "dist": "skewt"}
     try:
         response = requests.get(
-            API_URL.format(ticker=ticker), params=params, timeout=15
+            API_ENDPOINT.format(ticker=ticker), params=params, timeout=15
         )
         response.raise_for_status()
         return True, ticker, None

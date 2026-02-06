@@ -6,6 +6,8 @@ from typing import Literal
 from dotenv import load_dotenv
 from loguru import logger
 from pydantic import BaseModel
+from typing import Any
+
 
 # ---Pydantic models---
 DistType = Literal["normal", "t", "skewt", "ged"]
@@ -23,6 +25,13 @@ class PredictionResponse(BaseModel):
     model: str
     model_params: GarchParams
     predicted_volatility: float
+
+
+# /report
+class ReportResponse(BaseModel):
+    metrics_date: list[dict[str, Any]]
+    metrics_ticker: list[dict[str, Any]]
+    worst_tickers: list[dict[str, Any]]
 
 
 # GARCH Model Defaults

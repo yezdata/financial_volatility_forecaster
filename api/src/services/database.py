@@ -5,7 +5,7 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine, text
 
-from app.config import DB_URL, GarchParams
+from src.config import DB_URL, GarchParams
 
 engine = None
 
@@ -52,7 +52,7 @@ def store_preds(
     model_config = "_".join(str(atr) for atr in vars(params).values())
 
     sql_insert = text("""
-        INSERT INTO garch_preds (ticker, target_date, prediction, execution_time, p, q, dist)
+        INSERT INTO garch_preds (ticker, target_date, prediction, execution_time, model_config)
         VALUES (:ticker, :target_date, :prediction, :execution_time, :model_config)
         ON CONFLICT (ticker, target_date, model_config) 
         DO UPDATE SET 
@@ -83,10 +83,12 @@ def get_error_data() -> pd.DataFrame | None:
     for i in range(attempts):
         try:
             sql_extract = text("""
-                SELECT p.ticker, p.target_date, p.model_config, gp.error_abs, gp.error_rel, gp.error_sq, gp.error_raw
-                FROM garch_performance gp JOIN garch_preds p
+                SELECT p.ticker, p.target_date, p.model_config, p.prediction, gp.realized_vol, gp.error_abs, gp.error_rel, gp.error_sq, gp.error_raw
+                FROM garch_performance gp 
+                    JOIN garch_preds p
+                    ON gp.prediction_id = p.id
                 WHERE p.target_date < CURRENT_DATE
-                    AND p.target_date >= CURRENT_DATE - INTERVAL '7 days'
+                    AND p.target_date >= CURRENT_DATE - INTERVAL '10 days'
             """)
 
             with engine.begin() as conn:
