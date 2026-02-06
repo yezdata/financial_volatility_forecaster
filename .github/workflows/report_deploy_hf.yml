@@ -51,7 +51,7 @@ jobs:
 
           git remote add space "https://yezdata:$HF_TOKEN@huggingface.co/spaces/yezdata/financial-volatility-forecaster-report"
 
-          git subtree split --prefix api -b hf-deploy-branch
+          git subtree split --prefix report -b hf-deploy-branch
           git push space hf-deploy-branch:main --force
           git branch -D hf-deploy-branch
 
