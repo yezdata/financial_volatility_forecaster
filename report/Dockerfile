@@ -21,4 +21,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=user src .
 
 
-CMD ["streamlit", "run", "main.py", "--client.toolbarMode=minimal"]
+CMD ["streamlit", "run", "main.py", "--server.port=7860", "--server.address=0.0.0.0"]
