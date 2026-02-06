@@ -1,4 +1,5 @@
-name: Daily Model Predictions for Nasdaq-100 + Evaluation
+name: PREDICTIONS, EVALUATION-Daily Nasdaq-100
+
 on:
   schedule:
     - cron: '0 8 * * 2-6' # work days + 1 day to get RV
