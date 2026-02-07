@@ -32,7 +32,7 @@ Full interactive documentation (Swagger UI) is available here:
 👉 **[Live API Docs](https://yezdata-financial-volatility-forecaster.hf.space/docs)**
 
 ### Prediction Evaluation Dashboard
-View the performance of Nasdaq-100 forecasts from the last 10 days.
+View the performance of Nasdaq-100 forecasts from the last few days.
 👉 **[Live Performance Report](https://yezdata-financial-volatility-forecaster-report.hf.space)**
 
 ### Predict Volatility Endpoint
@@ -44,7 +44,7 @@ https://yezdata-financial-volatility-forecaster.hf.space/predict/{symbol}?p={p}&
 **Parameters:**
 | Parameter | Type | Required | Default | Description |
 | :--- | :--- | :---: | :---: | :--- |
-| `{symbol}` | string | ✅ Yes | - | Target Stock Ticker symbol (e.g., `AAPL`, `BTC-USD`). |
+| `{symbol}` | string | ✅ Yes | - | Target asset ticker symbol (e.g., `AAPL`, `BTC-USD`). |
 | `{p}` | int | ❌ No | `1` | **ARCH lag order**: Sensitivity to recent short-term market shocks. |
 | `{q}` | int | ❌ No | `1` | **GARCH lag order**: Long-term persistence (memory) of past volatility. |
 | `{dist}` | string | ❌ No | `skewt` | **Distribution**: Error assumption to account for fat tails. Available values : **normal, t, skewt, ged** |
@@ -83,8 +83,8 @@ The system uses a custom data library: [FinFetcher](https://github.com/eolybq/fi
 
 ### 2. Nasdaq-100 Daily Pipeline
 The project now features a production-ready automation flow:
-*   **Scheduled Predictions:** Scripts in `scripts/predict_nasdaq_100.py` perform daily forecasts for all Nasdaq-100 components.
-*   **Automated Evaluation:** Every prediction is eventually matched against realized volatility to calculate accuracy metrics (MAE, MAPE, RMSE).
+*   **Scheduled Predictions:** `scripts/predict_nasdaq_100.py` perform daily forecasts for all Nasdaq-100 components.
+*   **Automated Evaluation:** `scripts/evaluate.py` ensures that every prediction is matched against realized volatility to calculate accuracy metrics (MAE, MAPE, RMSE).
 
 ### 3. Database & Persistence Layer
 Instead of transient results, every prediction is grounded in a PostgreSQL backend:
