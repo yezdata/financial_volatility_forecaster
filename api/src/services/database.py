@@ -2,6 +2,7 @@ import time
 from datetime import date, datetime, timezone
 
 import pandas as pd
+from pandas.errors import EmptyDataError
 from loguru import logger
 from sqlalchemy import create_engine, text
 
@@ -73,7 +74,7 @@ def store_preds(
         logger.info(f"Stored prediction for {ticker} (Target: {target_date})")
 
 
-def get_error_data() -> pd.DataFrame | None:
+def get_error_data() -> pd.DataFrame:
     error_df = None
 
     if engine is None:
@@ -115,6 +116,6 @@ def get_error_data() -> pd.DataFrame | None:
         logger.error(
             "Could not get data from 'garch_performance' DB\nMax attempt reached\nReturning error page"
         )
-        return None
+        raise EmptyDataError
 
     return error_df

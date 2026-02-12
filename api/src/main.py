@@ -1,3 +1,4 @@
+from pandas.errors import EmptyDataError
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -100,10 +101,14 @@ def predict(
 
 @api.get("/report", response_model=ReportResponse)
 def get_report_data():
-    error_data = get_error_data()
-
-    if error_data is None or error_data.empty:
-        raise HTTPException(status_code=501, detail="DB ERROR")
+    try:
+        error_data = get_error_data()
+    except EmptyDataError:
+        raise HTTPException(
+            status_code=501, detail="Retrieved error data is None or empty"
+        )
+    except Exception:
+        raise HTTPException(status_code=501, detail="Connection to DB failed")
 
     error_data["error_rel"] = error_data["error_rel"] * 100
 
