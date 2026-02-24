@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="Financial Volatility Forecaster Report",
     page_icon=":bar_chart:",
     layout="wide",
-    menu_items={"About": "https://github.com/eolybq/financial_volatility_forecaster"},
+    menu_items={"About": "https://github.com/yezdata/financial_volatility_forecaster"},
 )
 
 load_dotenv()
