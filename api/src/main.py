@@ -59,7 +59,7 @@ def predict(
 
     except Exception as e:
         logger.exception("Error while getting data from FinFetcher")
-        raise HTTPException(status_code=500, detail=e)
+        raise HTTPException(status_code=500, detail=str(e))
 
     if data is None or target_date is None:
         raise HTTPException(
