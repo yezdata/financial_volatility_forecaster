@@ -21,6 +21,8 @@ def get_metrics(df_grouped: pd.DataFrame) -> pd.DataFrame:
 def get_metrics_data(
     df: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    df['model_config'] = [f"p:{p} q:{q} dist:{d}" for p, q, d in df['model_config'].str.split('_')]
+
     df_grouped_date = df.groupby(["target_date", "model_config"]).mean(
         numeric_only=True
     )
@@ -70,5 +72,6 @@ def get_metrics_data(
         },
         inplace=True,
     )
+
 
     return metrics_df_date, metrics_df_ticker, worst_tickers
