@@ -1,18 +1,30 @@
-name: HF Space Ping
+name: HF Space Ping - Financial Forecaster
 
 on:
   schedule:
     - cron: '0 0 * * *'
-
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Hugging Face Spaces
+      - name: Wake up Forecaster API
         run: |
-          echo "Pinging API..."
-          curl -I -s -o /dev/null -w "%{http_code}" https://huggingface.co/spaces/yezdata/financial-volatility-forecaster | grep -E "200|302"
-          echo -e "\nPinging Report..."
-          curl -I -s -o /dev/null -w "%{http_code}" https://huggingface.co/spaces/yezdata/financial-volatility-forecaster-report | grep -E "200|302"
+          STATUS=$(curl -L -s -o /dev/null -w "%{http_code}" \
+            --retry 5 \
+            --retry-delay 15 \
+            --retry-all-errors \
+            "https://yezdata-financial-volatility-forecaster.hf.space/health")
+          echo "Forecaster Status: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then exit 1; fi
+
+      - name: Wake up Report
+        run: |
+          STATUS=$(curl -L -s -o /dev/null -w "%{http_code}" \
+            --retry 5 \
+            --retry-delay 15 \
+            --retry-all-errors \
+            "https://yezdata-financial-volatility-forecaster-report.hf.space")
+          echo "Report Status: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then exit 1; fi
